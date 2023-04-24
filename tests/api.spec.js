@@ -1,6 +1,5 @@
 const { test, expect, request } = require('@playwright/test');
 const logindata = require('./data/login.json');
-const { default: APIClient } = require('./resources/apiClient');
 const orderdata = require("./data/order.json");
 const {APIUtils} = require('./helpers/APIUtils')
 
