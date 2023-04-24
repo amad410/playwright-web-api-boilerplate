@@ -1,0 +1,192 @@
+import { Browser, expect, Locator, Page } from '@playwright/test';
+
+export class PlaywrightDevPage {
+  readonly page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async goto() {
+    await this.page.goto('/');
+  }
+
+  async waitForNetworkIdleState(){
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async waitForDomLoadedState(){
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  async switchNewTab(browser : Browser) : Promise<any>{
+    const context = browser.contexts;
+
+
+    const newPage = await Promise.all(
+
+        [
+            await context[1].waitForEvent('page'),
+        
+        ]
+    );
+    return newPage;
+    
+  }
+
+  async switchToFrame(frame : string) : Promise<any>{
+    const framesPage = this.page.locator(frame);
+    return framesPage;
+    
+  }
+  async injectTokenToSessionStorage(token : string) {
+    this.page.addInitScript(value =>{
+        window.localStorage.setItem('token', value);
+    },token);
+  }
+
+  async waitforEvent(locator : string, browser : Browser) : Promise<any>{
+    const context = browser.contexts;
+
+
+    const newPage = await Promise.all(
+
+        [
+            await context[1].waitForEvent('page'),
+            await this.click(locator),
+        
+        ]
+    );
+
+    return newPage;
+    
+  }
+
+
+  async waitForClickNavigation(locator: string){
+    await Promise.all(
+
+        [
+            this.page.waitForNavigation(),
+            this.click(locator),
+
+        ]
+    );
+    
+  }
+
+  async closeTab(pageTab: Page){
+    await pageTab.close();
+  }
+
+  async waitForLoadedState(){
+    await this.page.waitForLoadState('load');
+  }
+
+  async selectDropDown(locator : string, option : string) : Promise<Locator>{
+    const element = this.page.locator(locator);
+    element.selectOption(option);
+    return element;
+  }
+
+  async selectCheckBoxBtn(locator : string) : Promise<Locator>{
+    const element = this.page.locator(locator);
+    element.check();
+    return element;
+  }
+
+  async unSelectCheckBoxBtn(locator : string) : Promise<Locator>{
+    const element = this.page.locator(locator);
+    if(await element.isChecked() == true)
+    {
+        element.uncheck();
+    }
+    
+    return element;
+  }
+
+  async selectFirstRadioBtn(locator : string) : Promise<Locator>{
+    const element = this.page.locator(locator);
+    element.first().click();
+    return element;
+  }
+
+  async selectLastRadioBtn(locator : string) : Promise<Locator>{
+    const element = this.page.locator(locator);
+    element.last().click();
+    return element;
+  }
+
+  async selectRadioBtn(){
+    
+  }
+
+
+
+  async switchToWindow(){
+
+  }
+
+  async selectFromCalendar(){
+
+  }
+
+  async getAll(locator: string ) : Promise<Array<Locator>>{
+    const elements = await this.page.locator(locator).all();
+    return elements;
+  }
+
+  async getTextContent(locator : string) : Promise<string>{
+    const element = await this.page.locator(locator);
+    return await element.textContent.toString();
+  }
+
+  async click(locator : string){
+    const element = await this.page.locator(locator).click();
+  }
+
+  async dblClick(locator : string){
+    const element = await this.page.locator(locator).dblclick();
+  }
+
+  async typeText(locator : string, value : string){
+    const element = await this.page.locator(locator).type(value);
+  }
+
+  async fillText(locator : string, value : string){
+    const element = await this.page.locator(locator).fill(value);
+  }
+
+  async count(locator : string) : Promise<number>{
+    return await this.page.locator(locator).count();
+
+  }
+
+  async clear(locator : string){
+    const element = await this.page.locator(locator).clear();
+  }
+
+  async getAllTextContents(locator : string) : Promise<Array<string>>{
+    const element = await this.page.locator(locator);
+    return await element.allTextContents();
+  }
+
+  async getAllInnerTexts(locator : string) : Promise<Array<string>>{
+    const element = this.page.locator(locator);
+    return await element.allInnerTexts();
+  }
+
+  async hover(locator : string) {
+    const element = this.page.locator(locator);
+    await element.hover();
+  }
+
+  async acceptAlertDialog() {
+    this.page.on('dialog', dialog => dialog.accept);
+  }
+
+  async cancelAlertDialog() {
+    this.page.on('dialog',dialog => dialog.dismiss);
+  }
+
+}  
